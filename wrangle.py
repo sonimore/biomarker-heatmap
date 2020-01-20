@@ -26,14 +26,13 @@ def getFiles(dir, typeOfFiles):
 	listOfBioDefs = []
 	for f in listOfFiles:
 		try:
-			biodef = re.search("(?<=cibersort_wilcox_).*$", f)
+			biodef = re.search("(?<=gene_sig_).*$", f)
 			biodef = biodef.group()[:-4]
 		except:
 			print("Unable to find", typeOfFiles, "in name. Keeping original filename.")
 			biodef = f
 		# print("Number of samples found", num)
-		
-		# biodef = biodef.group()
+
 		listOfBioDefs.append(biodef)
 
 	print(listOfBioDefs)
@@ -44,9 +43,9 @@ Takes as input a datafile with features as the rows. Outputs a list of those fea
 '''
 def getFeatures(path, filename, typeOfFiles):
 	data = pd.read_csv(path + typeOfFiles + filename + '.csv')
-	if typeOfFiles == 'ssgsea_wilcox_' or typeOfFiles == 'cibersort_wilcox_':
+	try:
 		return data['Hugo_Symbol']
-	else:
+	except:
 	# print(data['event'])
 		return data['event']
 
@@ -66,7 +65,6 @@ def wrangleData(path, files, typeOfFiles):
 	output = []
 	columns = ['event', 'group', 'pvalue', 'up_group', 'qvalue']
 	output.append(columns)
-	# print(output)
 
 
 	# For every feature and for every biomarker-def group, 
@@ -82,9 +80,9 @@ def wrangleData(path, files, typeOfFiles):
 			# print(d.at[featureIndex, 'pvalue'])
 			p = d.at[featureIndex, 'pvalue']
 			up = ''
-			if typeOfFiles == 'ssgsea_wilcox_' or typeOfFiles == 'cibersort_wilcox_':
+			try:
 				up = d.at[featureIndex, 'up_grp']
-			else:
+			except:
 				up = d.at[featureIndex, 'up_group']
 			q = d.at[featureIndex, 'qvalue']
 
@@ -108,15 +106,20 @@ def getDataArray(dataFile, newFilename):
 def main():
 	# Directory where mutation p-value tables are stored.
 	# mutDir = "/Users/smoreno/Dropbox (Partners HealthCare)/bms025/Output/mutations_fisher/"
+	wd = "/Users/smoreno/Dropbox (Partners HealthCare)/bms025/Output/"
 	ssgseaDir = "/Users/smoreno/Dropbox (Partners HealthCare)/bms025/Output/ssgsea_wilcox/"
 	cibersortDir = '/Users/smoreno/Dropbox (Partners HealthCare)/bms025/Output/cibersort_wilcox/'
 	# typeOfFiles = 'mutations_fisher_test_'
 	# typeOfFiles = 'ssgsea_wilcox_'
-	typeOfFiles = 'cibersort_wilcox_'
-	listOfFiles = getFiles(cibersortDir, typeOfFiles)
-	getFeatures(cibersortDir, listOfFiles[0], typeOfFiles)
-	d = wrangleData(cibersortDir, listOfFiles, typeOfFiles)
-	fn = '/Users/smoreno/Documents/heatmap/' + typeOfFiles + 'merged_longform.csv'
+	# typeOfFiles = 'cibersort_wilcox_'
+	typeOfFiles = "gene_sig_"
+	geneSigDir = wd + "gene_signatures_wilcox/"
+	# listOfFiles = getFiles(cibersortDir, typeOfFiles)
+
+	listOfFiles = getFiles(geneSigDir, typeOfFiles)
+	getFeatures(geneSigDir, listOfFiles[0], typeOfFiles)
+	d = wrangleData(geneSigDir, listOfFiles, typeOfFiles)
+	fn = '/Users/smoreno/Documents/heatmap/biomarker-heatmap/data/' + typeOfFiles + 'merged_longform.csv'
 	print("NAME: \n", fn)
 	getDataArray(d, fn)
 

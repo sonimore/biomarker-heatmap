@@ -51,7 +51,7 @@ var svg = d3.select("#my_dataviz")
 
 let lookup = {};
 //Read the data
-d3.csv("./data/cibersort_wilcox_merged_longform.csv", function(data) {
+d3.csv("https://raw.githubusercontent.com/sonimore/biomarker-heatmap/master/data/cibersort_wilcox_merged_longform.csv", function(data) {
   console.log("Raw data:", data)
 
   // Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
